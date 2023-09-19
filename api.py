@@ -78,7 +78,7 @@ class api:
         # check if there are songs
         if self.sorted_songs:
             # return the URI of the top song
-            return self.sorted_songs[0]["uri"]
+            return self.sorted_songs[7]["uri"]
         else:
             return None
     

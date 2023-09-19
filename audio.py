@@ -6,6 +6,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 
+
 class audio:
 
     def __init__(self) -> None:
@@ -32,6 +33,7 @@ class audio:
         ax.set_ylim(-32768, 32767)
     
     def update(self, frame):
+        
         try:
             # read audio data from stream
             audioData = np.frombuffer(self.stream.read(self.chunk_size), dtype=np.int16)
@@ -50,7 +52,7 @@ class audio:
 
     # create animation to update plot
     def createAnimation(self):
-        self.ani = FuncAnimation(self.fig, self.update, blit=True)
+        self.ani = FuncAnimation(self.fig, self.update, blit=True, cache_frame_data=False)
 
     def showPlot(self):
         plt.show()
