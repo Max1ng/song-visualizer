@@ -5,17 +5,19 @@ from requests import post
 import json
 import requests
 
+
 class api:
 
-#get IDs from .env file
+    #load the env file
     load_dotenv()
 
     def __init__(self) -> None:
+        #get IDs from .env file
         self.clientID = os.getenv("CLIENT_ID")
         self.clientSecret = os.getenv("CLIENT_SECRET")
         self.token = self.getToken()
 
-        self.artist_name = "khalid"
+        self.artist_name = "kesha"
         self.songs = self.getArtistSongs(self.artist_name, self.token)
 
 
@@ -37,12 +39,6 @@ class api:
 
     def getAuthHeader(self, token):
         return {"Authorization": "Bearer " + self.token}
-
-
-
-    
-    #print(self.token)
-
 
 
     def getArtistSongs(self, artist_name, token):
@@ -74,3 +70,15 @@ class api:
     def printSongs(self):
         for song in self.songs:
             print(song["name"])
+
+    def getTopSongURI(self):
+    # sort the songs by popularity
+        self.sorted_songs = sorted(self.songs, key=lambda x: x["popularity"], reverse=True)
+
+        # check if there are songs
+        if self.sorted_songs:
+            # return the URI of the top song
+            return self.sorted_songs[0]["uri"]
+        else:
+            return None
+    

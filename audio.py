@@ -2,6 +2,9 @@ import pyaudio
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+
 
 class audio:
 
@@ -19,6 +22,8 @@ class audio:
             input=True,
             frames_per_buffer=self.chunk_size
         )
+        self.sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope="user-library-read user-modify-playback-state"))
+        
 
     def createFigure(self): 
         self.fig, ax = plt.subplots()
@@ -29,10 +34,10 @@ class audio:
     def update(self, frame):
         try:
             # read audio data from stream
-            audio_data = np.frombuffer(self.stream.read(self.chunk_size), dtype=np.int16)
+            audioData = np.frombuffer(self.stream.read(self.chunk_size), dtype=np.int16)
             
             # update plot
-            self.line.set_ydata(audio_data)
+            self.line.set_ydata(audioData)
             return self.line,
         
         except KeyboardInterrupt:
@@ -49,3 +54,6 @@ class audio:
 
     def showPlot(self):
         plt.show()
+
+    def playSong(self, song):
+        self.sp.start_playback(uris=[song])
