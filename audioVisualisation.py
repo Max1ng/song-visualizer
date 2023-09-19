@@ -1,35 +1,49 @@
-import tkinter as tk
+import time
+import tkinter
 from PIL import Image, ImageTk
 
-# Create a tkinter window
-root = tk.Tk()
-root.title("Canvas with PNG Background")
+class audioVisualization(object):
+    def __init__(self, master, rocket, backgroundFile):
+        self.master = master
+        self.rocket = rocket
+        self.backgroundFile = backgroundFile
+        #background size
+        self.canvas = tkinter.Canvas(master, width=1920, height=1080)
+        self.canvas.pack()
 
-# Create a canvas
-canvas = tk.Canvas(root, width=800, height=600)
-canvas.pack()
+        # set the background image
+        backgroundImage = Image.open(self.backgroundFile)
+        self.backgroundPhoto = ImageTk.PhotoImage(backgroundImage)
+        self.canvas.create_image(0, 0, anchor=tkinter.NW, image=self.backgroundPhoto)
 
-# Load the background PNG image
-background_image = Image.open("background.png")
-background_photo = ImageTk.PhotoImage(background_image)
+        self.nextFrame = self.draw().__next__ 
+        master.after(1, self.nextFrame)
 
-# Display the background image on the canvas
-canvas.create_image(0, 0, anchor=tk.NW, image=background_photo)
+    def draw(self):
+        image = Image.open(self.rocket)
+        image = image.resize((image.width // 2, image.height // 2))  # change image size
+        angle = 330 #start pointing NE
+        direction = 1
 
-# Load the second PNG image with a transparent background
-second_image = Image.open("rocket.png")
-second_photo = ImageTk.PhotoImage(second_image, format="png")
+        while True:
+            rotatingImage = ImageTk.PhotoImage(image.rotate(angle))
+            #image location
+            rocketCanvas = self.canvas.create_image(750, 500, image=rotatingImage)
+            self.master.after_idle(self.nextFrame)
+            yield
+            self.canvas.delete(rocketCanvas)
 
-# Create a tkinter Label widget for the second image
-second_label = tk.Label(root, image=second_photo)
+            #change direction every 25 deg
+            if (angle - 330) % 25 == 0:
+                direction *= -1
 
-# Place the second image on top of the canvas at specific coordinates (x, y)
-x, y = 100, 100  # Adjust these coordinates as needed
-second_label.place(x=x, y=y)
+            angle += direction
+            angle %= 360
+            #wait .025 seconds between updates
+            time.sleep(0.025)
 
-# Keep references to the images and the Label widget to prevent them from being garbage collected
-canvas.background_photo = background_photo
-second_label.photo = second_photo
-
-# Run the tkinter main loop
+root = tkinter.Tk()
+#window size
+root.geometry("1920x1080")
+app = audioVisualization(root, 'rocket.png', 'background.png')
 root.mainloop()
