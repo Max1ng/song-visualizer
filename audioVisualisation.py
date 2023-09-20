@@ -32,13 +32,13 @@ class audioVisualization(object):
             #image location
             rocketCanvas = self.canvas.create_image(750, 500, image=rotatingImage)
             
-
-            self.drawBlob(750, 500, randint(100, 200))
+            #create blob and rocket
+            self.drawBlob(750, 500, 200)
             self.master.after_idle(self.nextFrame)
             yield
-            #self.canvas.delete(self.blob)
+            #delete current rocket and blob
             self.canvas.delete(rocketCanvas)
-            
+            self.canvas.delete(self.blob)
 
             #change direction every 25 deg
             if (angle - 330) % 25 == 0:
@@ -50,18 +50,18 @@ class audioVisualization(object):
             time.sleep(0.025)
             
     def drawBlob(self, x, y, size):
-        blob_points = []
-        num_points = 12  # You can adjust this number to control the complexity of the blob shape.
+        blobPoints = []
+        points = 12  #complexity of the blob
         
-        for i in range(num_points):
-            angle = math.radians(360 * i / num_points)  # Use a full circle (360 degrees) for the blob.
-            radius = size + size * 0.3 * math.sin(angle * 5)  # Adjust the multiplier (5) for the blob shape.
+        for i in range(points):
+            angle = math.radians(360 * i / points) 
+            radius = size + size * 0.3 * math.sin(angle * 5) 
             
             xPoint = x + radius * math.cos(angle)
             yPoint = y - radius * math.sin(angle)
-            blob_points.extend([xPoint, yPoint])
+            blobPoints.extend([xPoint, yPoint])
         
-        self.blob = self.canvas.create_polygon(blob_points, outline='blue', width=2, fill='cyan')
+        self.blob = self.canvas.create_polygon(blobPoints, outline='blue', width=2, fill='cyan')
 
 
 root = tkinter.Tk()
