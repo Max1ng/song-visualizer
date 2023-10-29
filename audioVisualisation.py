@@ -9,9 +9,12 @@ class audioVisualization(object):
         self.master = master
         self.rocket = rocket
         self.backgroundFile = backgroundFile
+        self.blobPoints = []
         #background size
         self.canvas = tkinter.Canvas(master, width=1920, height=1080)
         self.canvas.pack()
+
+        self.canvas.bind("<Button-1>", self.onCanvasClick)
 
         # set the background image
         backgroundImage = Image.open(self.backgroundFile)
@@ -50,18 +53,38 @@ class audioVisualization(object):
             time.sleep(0.025)
             
     def drawBlob(self, x, y, size):
-        blobPoints = []
-        points = 12  #complexity of the blob
         
+        points = 500  #complexity of the blob
+        self.blobPoints = []
+
         for i in range(points):
             angle = math.radians(360 * i / points) 
-            radius = size + size * 0.3 * math.sin(angle * 5) 
+            radius = size + size * 0.075 * math.sin(angle * 20) 
             
             xPoint = x + radius * math.cos(angle)
             yPoint = y - radius * math.sin(angle)
-            blobPoints.extend([xPoint, yPoint])
+            self.blobPoints.extend([xPoint, yPoint])
         
-        self.blob = self.canvas.create_polygon(blobPoints, outline='blue', width=2, fill='cyan')
+        self.blob = self.canvas.create_polygon(self.blobPoints, outline='blue', width=2, fill='red')
+
+    def onCanvasClick(self, event):
+        x, y = event.x, event.y
+        # Find the nearest blob point
+        min_distance = float('inf')
+        nearest_point_index = 0
+        for i in range(0, len(self.blobPoints), 2):
+            px, py = self.blobPoints[i], self.blobPoints[i + 1]
+            distance = math.sqrt((x - px) ** 2 + (y - py) ** 2)
+            if distance < min_distance:
+                min_distance = distance
+                nearest_point_index = i
+
+        # Update the nearest blob point to the mouse click position
+        self.blobPoints[nearest_point_index] = x
+        self.blobPoints[nearest_point_index + 1] = y
+        # Redraw the blob
+        self.canvas.delete(self.blob)
+        self.blob = self.canvas.create_polygon(self.blobPoints, outline='blue', width=2, fill='red')
 
 
 root = tkinter.Tk()
